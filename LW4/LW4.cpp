@@ -73,8 +73,9 @@ node<T>* node_create(T _data, node<T>* _next, node<T>* _prev)
 	new_node->m_next = _next;
 
 #ifdef NEED_PRINT_DEBUG
-	cout << "Node was created\n";
+	cout << "\tNode was created\n";
 #endif // NEED_PRINT_DEBUG
+	
 	return new_node;
 }
 
@@ -94,8 +95,9 @@ void node_delete(node<T>* _node)
 	_node = NULL;
 
 #ifdef NEED_PRINT_DEBUG
-	cout << "Node was deleted\n";
+	cout << "\tNode was deleted\n";
 #endif // NEED_PRINT_DEBUG
+
 }
 
 // печать элемента списка
@@ -106,8 +108,9 @@ void node_print(node<T>* _node, ostream& _out_stream = cout)
 	if (_node == NULL)
 	{
 #ifdef NEED_PRINT_DEBUG
-		cout<<  "Node does not exist\n";
+		cout<<  "\tNode does not exist\n";
 #endif // NEED_PRINT_DEBUG
+		
 		return;
 	}
 
@@ -140,7 +143,7 @@ list<T>* list_create()
 
 #ifdef NEED_PRINT_DEBUG
 
-	cout << "List was created\n";
+	cout << "\tList was created\n";
 
 #endif // NEED_PRINT_DEBUG
 
@@ -179,6 +182,47 @@ void list_push(list<T>* _list, T data)
 
 	//увеличиваем количество элементов
 	_list->m_size++;
+}
+
+// функция удаления элемента из конца списка
+template<typename T>
+void list_pop(list<T>* _list)
+{
+	//TODO неправильно работает метод pop
+	if (_list->m_end->m_prev != NULL)
+	{
+
+		// элемент удаления
+		node<T>* to_delete = _list->m_end->m_prev;
+
+		// если есть элементы
+		if (_list->m_begin != to_delete)
+		{
+
+			// разрыв связей с элементом удаления
+			//if(to_delete->m_prev != NULL)
+			to_delete->m_prev->m_next = to_delete->m_next;
+
+			to_delete->m_next->m_prev = to_delete->m_prev;
+
+			// удаления самого элемента
+			node_delete(to_delete);
+
+
+
+	#ifdef NEED_PRINT_DEBUG
+			cout << "\tLast element was deleted\n";
+	#endif // NEED_PRINT_DEBUG
+		}
+		else
+		{
+			_list->m_end = NULL;
+			_list->m_begin->m_prev = NULL;
+
+			node_delete(to_delete);
+		}
+		_list->m_size--;
+	}
 }
 
 // удаление списка
@@ -220,8 +264,9 @@ void list_delete(list<T>*& _list)
 
 #ifdef NEED_PRINT_DEBUG
 
-	cout << "List was deleted\n";
+	cout << "\tList was deleted\n";
 #endif // NEED_PRINT_DEBUG
+
 }
 
 // печать списка
@@ -233,7 +278,7 @@ void list_print(list<T>* _list, ostream& _out_stream = cout)
 	{
 
 #ifdef NEED_PRINT_DEBUG
-		cout << "List does not exist\n";
+		cout << "\tList does not exist\n";
 #endif // NEED_PRINT_DEBUG
 
 		return;
@@ -273,8 +318,22 @@ int main()
 
 	list_print(lst);
 
-	list_delete(lst);
+	list_pop(lst);
+	list_pop(lst);
+	list_pop(lst);
+	list_pop(lst);
+	list_pop(lst);
+	list_pop(lst);
 
+	list_print(lst);
+
+	list_push(lst, 4);
+	list_push(lst, 5);
+	list_push(lst, 6);
+
+	list_print(lst);
+
+	list_delete(lst);
 }
 
 /**************** End Of LW4.cpp File ***************/
