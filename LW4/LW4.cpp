@@ -39,7 +39,15 @@ using namespace std;
 ****************************************************************/
 
 // если нужна печать по каждому действию
-#define NEED_PRINT_DEBUG 0
+#define NEED_PRINT_DEBUG 1
+
+// минимальное и максимальное значение ввода элементов
+#define MIN_VALUE -1000.0
+#define MAX_VALUE 1000.0
+
+// минимальное и максимальное значение ввода элементов
+#define MIN_VALUE_INSERT -1
+#define MAX_VALUE_INSERT 100000
 
 // вывод в консоль сообщения
 #define INFO(str) if(NEED_PRINT_DEBUG) cout<<"\t"<<str<<"\n";
@@ -47,37 +55,85 @@ using namespace std;
 // не существует ли список
 #define LIST_NOT_EXSISTS(f_name)\
 	if(!list_exists(_list)){\
-		cout << "\t" << f_name << ": list не существует\n";\
+		cout << "\t" << f_name << ": список не существует\n";\
 		return;\
 	}
 
 // не существует ли список возвращаем ret_obj
 #define LIST_NOT_EXSISTS_RET(f_name, ret_obj)\
 	if(!list_exists(_list)){\
-		cout << "\t" << f_name << ": list не существует\n";\
+		cout << "\t" << f_name << ": список не существует\n";\
 		return ret_obj;\
 	}
 
 // пуст ли список
 #define LIST_EMPTY(f_name)\
 	if(list_is_empty(_list)){\
-		cout << "\t" << f_name << ": list пуст\n";\
+		cout << "\t" << f_name << ": список пуст\n";\
 		return;\
 	}
 
 // пуст ли список возвращаем ret_obj
 #define LIST_EMPTY_RET(f_name, ret_obj)\
 	if(list_is_empty(_list)){\
-		cout << "\t" << f_name << ": list пуст\n";\
+		cout << "\t" << f_name << ": список пуст\n";\
 		return ret_obj;\
 	}
 
 // заполнение len элементов элементом symb
 #define OUT_W(symb, len) fixed << setfill(symb) << setw(len)
 
+// коды для взаимодействия пользователья с программой
+enum class input_codes
+{
+	exit = -1,
+	template_program,
+	list_create,
+	list_push,
+	list_pop,
+	list_insert,
+	list_print,
+	list_delete,
+	clear_console
+};
+
+// строка с коммандами
+const char* command_str =
+"\nВведите номер комманды:\n\
+\t1. Выйти из программы.\n\
+\t2. Запустить пример готового алгоритма.\n\
+\t3. Создать список.\n\
+\t4. Добавить элемент в конец списка.\n\
+\t5. Удалить элемент с конца списка.\n\
+\t6. Вставить элемент в определенную позицию.\n\
+\t7. Распечатать список.\n\
+\t8. Удалить список.\n\
+\t9. Очистить консоль.\n";
+
 /****************************************************************
 *              П Р О Т О Т И П Ы   Ф У Н К Ц И Й                *
 ****************************************************************/
+
+/****************************************************************
+*        В С П О М О Г А Т Е Л Ь Н Ы Е   Ф У Н К Ц И И          *
+****************************************************************/
+
+// ввод и проверка значений
+template<typename T = int>
+T input_and_check(
+	T _min,
+	T _max,
+	const char* welcome_str,
+	const char* err_str = "Было введено не то значение"
+);
+
+// функция ведения диалога с пользователем
+template<typename T>
+void dialog();
+
+// пример работы с List
+void example_program();
+
 /****************************************************************
 *							   N O D E					        *
 ****************************************************************/
@@ -166,36 +222,8 @@ int main()
 {
 	setlocale(LC_ALL, "ru");
 
-	list<double>* lst = list_create<double>();
-
-	list_push(lst, 5.2);
-	list_push(lst, 1.3);
-	list_push(lst, 5.1456);
-	list_push(lst, 45656.9);
-	list_push(lst, 0.456);
-
-	list_print(lst);
-
-	list_insert(lst, 4, -10.0);
-	list_insert(lst, 0, 800.5);
-	list_insert(lst, 0, 99.009);
-
-	list_print(lst);
-
-	list_pop(lst);
-	list_pop(lst);
-	list_pop(lst);
-	list_pop(lst);
-
-	list_print(lst);
-
-	cout << "Максимальное число в списке: ";
-	node_print(list_find_max_elem(lst));
-	cout << '\n';
-
-	list_delete(lst);
-
-	list_print(lst);
+	//example_program();
+	dialog<double>();
 
 	return 0;
 }
@@ -203,6 +231,183 @@ int main()
 /****************************************************************
 *              Р Е А Л И З А Ц И Я   Ф У Н К Ц И Й              *
 ****************************************************************/
+
+/****************************************************************
+*        В С П О М О Г А Т Е Л Ь Н Ы Е   Ф У Н К Ц И И          *
+****************************************************************/
+
+// ввод и проверка значений
+template<typename T = int>
+T input_and_check(T _min, T _max,
+	const char* welcome_str, const char* err_str)
+{
+	// размер массива
+	T num;
+
+	// вывод сообщения
+	cout << welcome_str << "\n";
+	cin >> num;
+
+	// если было введено не то
+	if (num > _max || num < _min) {
+		// если была введена не цифра
+		if (cin.fail())
+		{
+			cin.clear();
+			cin.ignore(INT_MAX, '\n');
+		}
+
+		// отчистка консоли
+		//system("cls");
+		cout << err_str << "\n";
+
+		// рекурсивное обращение
+		num = input_and_check(_min, _max, welcome_str, err_str);
+	}
+	return num;
+}
+
+// функция ведения диалога с пользователем
+template<typename T>
+void dialog()
+{
+	/* коды комманд
+	exit				-1
+	template_program	0
+	list_create			1
+	list_push			2
+	list_pop			3
+	list_insert			4
+	list_print			5
+	list_delete			6
+	clear_console		7
+	*/
+
+	// переменная содержащая коды действий
+	input_codes in_code;
+
+	// элемент для вставки
+	T elem;
+
+	//позиция вставки
+	int pos_to_insert;
+
+	// переменная списка
+	list<T>* lst = NULL;
+
+	do
+	{
+		// запрос у пользователя следующих действий
+		in_code = input_codes(input_and_check(1, 9, command_str) - 2);
+
+		// запуск соответствующих функций
+		switch (in_code)
+		{
+		case input_codes::exit:
+			INFO("Произведен выход");
+			break;
+
+		case input_codes::template_program:
+			INFO("Запуск примера кода");
+			example_program();
+			break;
+
+		case input_codes::list_create:
+			lst = list_create<T>();
+			break;
+
+		case input_codes::list_push:
+			elem = input_and_check(MIN_VALUE, MAX_VALUE,
+				"Введите элемент для вставки в конец");
+			list_push(lst, elem);
+			break;
+
+		case input_codes::list_pop:
+			list_pop(lst);
+			break;
+
+		case input_codes::list_insert:
+			elem = input_and_check(MIN_VALUE, MAX_VALUE,
+				"Введите элемент для вставки");
+
+			pos_to_insert = input_and_check(MIN_VALUE_INSERT, MAX_VALUE_INSERT,
+				"Введите позицию для вставки");
+
+			// вставка элемента 
+			list_insert(lst, pos_to_insert, elem);
+			break;
+
+		case input_codes::list_print:
+			// печать списка
+			list_print(lst);
+			break;
+
+		case input_codes::list_delete:
+			// удаление списка
+			list_delete(lst);
+			break;
+
+		case input_codes::clear_console:
+			system("cls");
+			break;
+
+		default:
+			break;
+		}
+
+	} while (
+		// пока пользователь не захотел выйти из программы
+		// или пока не запустил пример программыЫ
+		in_code != input_codes::exit &&
+		in_code != input_codes::template_program
+		);
+}
+
+// пример работы с List
+void example_program()
+{
+	// создание списка
+	list<double>* lst = list_create<double>();
+
+	// добавление элементов в конец
+	list_push(lst, 5.2);
+	list_push(lst, 1.3);
+	list_push(lst, 5.1456);
+	list_push(lst, 45656.9);
+	list_push(lst, 0.456);
+
+	// вывод списка
+	list_print(lst);
+
+	// вставка элемента в определенную позицию
+	list_insert(lst, 4, -10.0);
+	list_insert(lst, 0, 800.5);
+	list_insert(lst, 0, 99.009);
+
+	// вывод списка
+	list_print(lst);
+
+	// удаление элементов списка с конца
+	list_pop(lst);
+	list_pop(lst);
+	list_pop(lst);
+	list_pop(lst);
+
+	// вывод списка
+	list_print(lst);
+
+	// печать максимального элемента списка
+	cout << "Максимальное число в списке: ";
+	node_print(list_find_max_elem(lst));
+	cout << '\n';
+
+	// удаление списка
+	list_delete(lst);
+
+	// вывод списка
+	list_print(lst);
+}
+
 /****************************************************************
 *							   N O D E					        *
 ****************************************************************/
@@ -219,7 +424,7 @@ node<T>* node_create(T _data, node<T>* _next, node<T>* _prev)
 	new_node->m_next = _next;
 	new_node->m_prev = _prev;
 
-	INFO("Node был создан");
+	INFO("Элемент был создан");
 
 	return new_node;
 }
@@ -239,7 +444,7 @@ void node_delete(node<T>*& _node)
 	// обнуление памяти
 	_node = NULL;
 
-	INFO("Node был удален");
+	INFO("Элемент был удален");
 }
 
 // печать элемента списка
@@ -249,7 +454,7 @@ void node_print(node<T>* _node, ostream& _out_stream)
 	// выход из функции, если элемент не существует
 	if (_node == NULL)
 	{
-		INFO("Node не существует");
+		INFO("Элемент не существует");
 		return;
 	}
 
@@ -282,7 +487,7 @@ list<T>* list_create()
 	// выделение памяти под список
 	list<T>* _list = new list<T>;
 
-	INFO("List был создан");
+	INFO("Список был создан");
 
 	// возвращение адресса списка list
 	return _list;
@@ -325,6 +530,8 @@ void list_push(list<T>* _list, T data)
 
 	//увеличиваем количество элементов
 	_list->m_size++;
+
+	INFO("Элемент добавлен в конец");
 }
 
 // функция удаления элемента из конца списка
@@ -357,7 +564,7 @@ void list_pop(list<T>* _list)
 	// удаления самого элемента
 	node_delete(to_delete);
 
-	INFO("Last элемент был удален");
+	INFO("Последний элемент был удален");
 
 	// уменьшение размера списка на 1
 	_list->m_size--;
@@ -383,7 +590,7 @@ void list_delete(list<T>*& _list)
 	// обнуление адреса
 	_list = NULL;
 
-	INFO("List был удален")
+	INFO("Список был удален")
 }
 
 // печать списка
@@ -412,10 +619,10 @@ void list_print(list<T>* _list, ostream& _out_stream)
 	while (cur_el != NULL)
 	{
 		// вывод данных элемента
-		_out_stream << "| "<<OUT_W(' ',6) << i 
+		_out_stream << "| " << OUT_W(' ', 6) << i
 			<< " | " << setprecision(1) << OUT_W(' ', 8);
 		node_print(cur_el, _out_stream);
-		cout  << " |\n";
+		cout << " |\n";
 
 		// переход к следующему элементу
 		cur_el = cur_el->m_next;
@@ -475,7 +682,7 @@ void list_insert(list<T>* _list, int _pos, T _insert_data)
 	// позиция должна быть не больше размера списка
 	if (_pos < 0 || _pos >= _list->m_size)
 	{
-		cout << "\tINSERT: pos некорректна\n";
+		cout << "\tINSERT: позиция некорректна\n";
 		return;
 	}
 
