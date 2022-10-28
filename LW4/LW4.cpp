@@ -30,6 +30,7 @@
 \***********************************************************************/
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -46,30 +47,33 @@ using namespace std;
 // не существует ли список
 #define LIST_NOT_EXSISTS(f_name)\
 	if(!list_exists(_list)){\
-		cout << "\t" << f_name << ": list not exists\n";\
+		cout << "\t" << f_name << ": list не существует\n";\
 		return;\
 	}
 
 // не существует ли список возвращаем ret_obj
 #define LIST_NOT_EXSISTS_RET(f_name, ret_obj)\
 	if(!list_exists(_list)){\
-		cout << "\t" << f_name << ": list not exists\n";\
+		cout << "\t" << f_name << ": list не существует\n";\
 		return ret_obj;\
 	}
 
 // пуст ли список
 #define LIST_EMPTY(f_name)\
 	if(list_is_empty(_list)){\
-		cout << "\t" << f_name << ": list is empty\n";\
+		cout << "\t" << f_name << ": list пуст\n";\
 		return;\
 	}
 
 // пуст ли список возвращаем ret_obj
 #define LIST_EMPTY_RET(f_name, ret_obj)\
 	if(list_is_empty(_list)){\
-		cout << "\t" << f_name << ": list is empty\n";\
+		cout << "\t" << f_name << ": list пуст\n";\
 		return ret_obj;\
 	}
+
+// заполнение len элементов элементом symb
+#define OUT_W(symb, len) fixed << setfill(symb) << setw(len)
 
 /****************************************************************
 *              П Р О Т О Т И П Ы   Ф У Н К Ц И Й                *
@@ -160,6 +164,8 @@ void list_insert(list<T>* _list, int _pos, T _insert_data);
 
 int main()
 {
+	setlocale(LC_ALL, "ru");
+
 	list<double>* lst = list_create<double>();
 
 	list_push(lst, 5.2);
@@ -183,7 +189,9 @@ int main()
 
 	list_print(lst);
 
-	node_print( list_find_max_elem(lst));
+	cout << "Максимальное число в списке: ";
+	node_print(list_find_max_elem(lst));
+	cout << '\n';
 
 	list_delete(lst);
 
@@ -211,7 +219,7 @@ node<T>* node_create(T _data, node<T>* _next, node<T>* _prev)
 	new_node->m_next = _next;
 	new_node->m_prev = _prev;
 
-	INFO("Node was created");
+	INFO("Node был создан");
 
 	return new_node;
 }
@@ -231,7 +239,7 @@ void node_delete(node<T>*& _node)
 	// обнуление памяти
 	_node = NULL;
 
-	INFO("Node was deleted");
+	INFO("Node был удален");
 }
 
 // печать элемента списка
@@ -241,12 +249,12 @@ void node_print(node<T>* _node, ostream& _out_stream)
 	// выход из функции, если элемент не существует
 	if (_node == NULL)
 	{
-		INFO("Node does not exist");
+		INFO("Node не существует");
 		return;
 	}
 
 	// печать данных в поток
-	_out_stream << "data: " << _node->m_data << '\n';
+	_out_stream << _node->m_data;
 }
 
 /****************************************************************
@@ -274,7 +282,7 @@ list<T>* list_create()
 	// выделение памяти под список
 	list<T>* _list = new list<T>;
 
-	INFO("List was created");
+	INFO("List был создан");
 
 	// возвращение адресса списка list
 	return _list;
@@ -349,7 +357,7 @@ void list_pop(list<T>* _list)
 	// удаления самого элемента
 	node_delete(to_delete);
 
-	INFO("Last element was deleted");
+	INFO("Last элемент был удален");
 
 	// уменьшение размера списка на 1
 	_list->m_size--;
@@ -375,7 +383,7 @@ void list_delete(list<T>*& _list)
 	// обнуление адреса
 	_list = NULL;
 
-	INFO("List was deleted")
+	INFO("List был удален")
 }
 
 // печать списка
@@ -386,26 +394,35 @@ void list_print(list<T>* _list, ostream& _out_stream)
 	LIST_NOT_EXSISTS("PRINT");
 	LIST_EMPTY("PRINT");
 
-	// дополнительная информация о списке list
-	_out_stream << "size: " << _list->m_size << endl;
-
 	// создаем элемент для чтения данных из list'а
 	node<T>* cur_el = _list->m_begin;
 
 	// индекс элемента
 	int i = 0;
 
+	// печать шапки таблицы
+	cout << OUT_W('_', 22) << '\n';
+
+	// дополнительная информация о списке list
+	_out_stream << "|_размер:_" <<
+		OUT_W('_', 9) << _list->m_size << "_|\n";
+	cout << "|_индекс_|_значение_|\n";
+
 	// идем по list'у, пока на наткнемся на конечный элемент
 	while (cur_el != NULL)
 	{
 		// вывод данных элемента
-		_out_stream << "index: " << i << " ";
+		_out_stream << "| "<<OUT_W(' ',6) << i 
+			<< " | " << setprecision(1) << OUT_W(' ', 8);
 		node_print(cur_el, _out_stream);
+		cout  << " |\n";
 
 		// переход к следующему элементу
 		cur_el = cur_el->m_next;
 		i++;
 	}
+	// печать конца таблицы
+	cout << OUT_W('-', 22) << '\n';
 }
 
 // поиск максимального значения
@@ -452,10 +469,13 @@ node<T>* list_find_max_elem(list<T>* _list)
 template<typename T>
 void list_insert(list<T>* _list, int _pos, T _insert_data)
 {
+	// выход, если список не существует
+	LIST_NOT_EXSISTS("INSERT");
+
 	// позиция должна быть не больше размера списка
 	if (_pos < 0 || _pos >= _list->m_size)
 	{
-		cout << "\tINSERT: pos is incorrect\n";
+		cout << "\tINSERT: pos некорректна\n";
 		return;
 	}
 
@@ -493,7 +513,7 @@ void list_insert(list<T>* _list, int _pos, T _insert_data)
 	// увеличение размера списка
 	_list->m_size++;
 
-	INFO("Element insterted");
+	INFO("Элемент вставлен");
 }
 
 /**************** End Of LW4.cpp File ***************/
