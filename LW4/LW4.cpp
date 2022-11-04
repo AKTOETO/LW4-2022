@@ -7,7 +7,7 @@
 *	Language     : c/c++												*
 *	Programmers  : Плоцкий Б.А. Раужев Ю. М.							*
 *	Created      :  27/10/22											*
-*	Last revision:  --/10/22											*
+*	Last revision:  04/11/22											*
 *	Comment(s)   : 														*
 *																		*
 *	Реализовать заданный согласно варианту задания линейный список,		*
@@ -259,9 +259,6 @@ void list_insert(
 int main()
 {
 	setlocale(LC_ALL, "ru");
-
-	// вызов примера работы программы
-	//example_program();
 	 
 	// запуск диалога с пользователем
 	dialog<double>();
@@ -714,30 +711,25 @@ node<T>* list_find_max_elem(list<T>* _list)
 	LIST_EMPTY_RET("FIND", NULL);
 
 	// элемент списка, который мы ищем
-	node<T>* data = NULL;
+	node<T>* data = _list->m_begin;
 
-	// Если элементов в списке больше одного
-	if (_list->m_begin != _list->m_end)
+	// берем элемент, с помощью которого
+	// пройдемся по всему списку
+	// он равен второму по счету элементу в списке
+	node<T>* cur_node = _list->m_begin->m_next;
+
+	// пока не дошли до конца списка
+	while (cur_node != NULL)
 	{
-		// берем элемент, с помощью которого
-		// пройдемся по всему списку
-		node<T>* cur_node = _list->m_begin->m_next;
-
-		data = _list->m_begin;
-
-		// пока не дошли до конца списка
-		while (cur_node != NULL)
+		// сравниваем с помощью _comp информацию в 
+		// cur_node и в следующем элементе
+		if (cur_node->m_data >= data->m_data)
 		{
-			// сравниваем с помощью _comp информацию в 
-			// cur_node и в следующем элементе
-			if (cur_node->m_data >= data->m_data)
-			{
-				data = cur_node;
-			}
-
-			// переход к следующему элементу
-			cur_node = cur_node->m_next;
+			data = cur_node;
 		}
+
+		// переход к следующему элементу
+		cur_node = cur_node->m_next;
 	}
 
 	// возвращение найденного элемента списка
@@ -752,7 +744,7 @@ void list_insert(list<T>* _list, int _pos, T _insert_data)
 	// выход, если список не существует
 	LIST_NOT_EXSISTS("INSERT");
 
-	// позиция должна быть не больше размера списка
+	// позиция должна быть меньше размера списка
 	if (_pos < 0 || _pos >= _list->m_size)
 	{
 		cout << "\tINSERT: Позиция некорректна\n";
@@ -778,7 +770,7 @@ void list_insert(list<T>* _list, int _pos, T _insert_data)
 		node_create<T>(_insert_data, cur_node, cur_node->m_prev);
 
 	// настройка связей у элементов в списке
-	// если элемент вставляется не на нулевую позицию
+	// если перед cur_node есть элементы
 	if (cur_node->m_prev != NULL)
 	{
 		cur_node->m_prev->m_next = instert_elem;
