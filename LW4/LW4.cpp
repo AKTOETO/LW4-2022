@@ -166,12 +166,9 @@ void node_delete(
 	node<T>*& _node	// ссылка на элемент
 );
 
-// печать элемента списка
+// возвращение значение элемента
 template<typename T>
-void node_print(
-	node<T>* _node,				// элемент для печати
-	ostream& _out_stream = cout	// поток для печати
-);
+T node_get_data(node<T>* _node);
 
 /****************************************************************
 *							   L I S T					        *
@@ -248,7 +245,7 @@ void list_insert(
 
 // печать индекса максимального элемента и его значения
 template<typename T>
-void print_max_elem(
+void list_print_max_elem(
 	list<T>* _list	// указатель на список
 );
 
@@ -397,7 +394,7 @@ void dialog()
 			break;
 			 
 		case input_codes::find_max:
-			print_max_elem(lst);
+			list_print_max_elem(lst);
 			break;
 
 		default:
@@ -446,11 +443,8 @@ void example_program()
 	// вывод списка
 	list_print(lst);
 
-	//// печать максимального элемента списка
-	//cout << "Максимальное число в списке: ";
-	//node_print(list_find_max_elem(lst));
-	//cout << '\n';
-	print_max_elem(lst);
+	// печать максимального элемента списка
+	list_print_max_elem(lst);
 
 	// удаление списка
 	list_delete(lst);
@@ -498,19 +492,18 @@ void node_delete(node<T>*& _node)
 	INFO("Элемент был удален");
 }
 
-// печать элемента списка
+// возвращение значение элемента
 template<typename T>
-void node_print(node<T>* _node, ostream& _out_stream)
+T node_get_data(node<T>* _node)
 {
 	// выход из функции, если элемент не существует
 	if (_node == NULL)
 	{
-		INFO("NODE PRINT: Элемент не существует");
-		return;
+		INFO("NODE GET DATA: Элемент не существует");
+		return 0;
 	}
 
-	// печать данных в поток
-	_out_stream << _node->m_data;
+	return _node->m_data;
 }
 
 /****************************************************************
@@ -671,9 +664,9 @@ void list_print(list<T>* _list, ostream& _out_stream)
 	{
 		// вывод данных элемента
 		_out_stream << "| " << OUT_W(' ', 6) << i
-			<< " | " << setprecision(1) << OUT_W(' ', 8);
-		node_print(cur_el, _out_stream);
-		_out_stream << " |\n";
+			<< " | " << setprecision(1)
+			<< OUT_W(' ', 8) << node_get_data(cur_el)
+			<< " |\n";
 
 		// переход к следующему элементу
 		cur_el = cur_el->m_next;
@@ -775,7 +768,7 @@ void list_insert(list<T>* _list, int _pos, T _insert_data)
 }
 
 template<typename T>
-void print_max_elem(list<T>* _list)
+void list_print_max_elem(list<T>* _list)
 {
 	LIST_NOT_EXSISTS("PRINT MAX ELEM");
 	LIST_EMPTY("PRINT MAX ELEM");
@@ -787,12 +780,10 @@ void print_max_elem(list<T>* _list)
 	node<T>* max_elem = list_find_max_elem(_list, pos);
 
 	// печать позиции максимального элемента
+	// и самого элемента
 	cout << "Позиция max элемента: " << pos + 1 << endl;
-	cout << "Значение максимального элемента: ";
-
-	// его печать
-	node_print(max_elem);
-	cout << endl;
+	cout << "Значение максимального элемента: "
+		<< node_get_data(max_elem) << endl;
 }
 
 /**************** End Of LW4.cpp File ***************/
