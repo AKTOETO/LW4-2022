@@ -38,16 +38,16 @@ using namespace std;
 *					   К О Н С Т А Н Т Ы						*
 ****************************************************************/
 
-// если нужна печать по каждому действию
+// если нужна печать по каждому действию (0, 1)
 #define NEED_PRINT_DEBUG 1
 
 // минимальное и максимальное значение ввода элементов
-#define MIN_VALUE -1000.0
 #define MAX_VALUE 1000.0
+#define MIN_VALUE -1000.0
 
 // минимальное и максимальное значение ввода элементов
-#define MIN_VALUE_INSERT -1
 #define MAX_VALUE_INSERT 100000
+#define MIN_VALUE_INSERT 0
 
 // вывод в консоль сообщения
 #define INFO(str) if(NEED_PRINT_DEBUG) cout<<"\t"<<str<<"\n";
@@ -173,13 +173,6 @@ void node_print(
 	ostream& _out_stream = cout	// поток для печати
 );
 
-// печать максимального элемента списка
-template<typename T>
-void node_print_max(
-	node<T>* _node,				// элемент для печати
-	ostream& _out_stream = cout	// поток для печати
-);
-
 /****************************************************************
 *							   L I S T					        *
 ****************************************************************/
@@ -241,7 +234,8 @@ void list_print(
 // поиск максимального значения
 template<typename T>
 node<T>* list_find_max_elem(
-	list<T>* _list	// указатеьл на список
+	list<T>* _list,	// указатель на список
+	int& _pos		// позиция элемента в списке
 );
 
 // включение элемента в определенную позицию списка
@@ -250,6 +244,12 @@ void list_insert(
 	list<T>* _list,	// указатель на список
 	int _pos,		// позиция вставки
 	T _insert_data	// информация для вставки
+);
+
+// печать индекса максимального элемента и его значения
+template<typename T>
+void print_max_elem(
+	list<T>* _list	// указатель на список
 );
 
 /****************************************************************
@@ -275,7 +275,7 @@ int main()
 ****************************************************************/
 
 // ввод и проверка значений
-template<typename T = int>
+template<typename T>
 T input_and_check(T _min, T _max,
 	const char* welcome_str, const char* err_str)
 {
@@ -397,10 +397,7 @@ void dialog()
 			break;
 			 
 		case input_codes::find_max:
-			// поиск максимального значения в списке
-			max_elem = list_find_max_elem(lst);
-			// его печать
-			node_print_max(max_elem);
+			print_max_elem(lst);
 			break;
 
 		default:
@@ -449,10 +446,11 @@ void example_program()
 	// вывод списка
 	list_print(lst);
 
-	// печать максимального элемента списка
-	cout << "Максимальное число в списке: ";
-	node_print(list_find_max_elem(lst));
-	cout << '\n';
+	//// печать максимального элемента списка
+	//cout << "Максимальное число в списке: ";
+	//node_print(list_find_max_elem(lst));
+	//cout << '\n';
+	print_max_elem(lst);
 
 	// удаление списка
 	list_delete(lst);
@@ -514,23 +512,6 @@ void node_print(node<T>* _node, ostream& _out_stream)
 	// печать данных в поток
 	_out_stream << _node->m_data;
 }
-
-// печать максимального элемента списка
-template<typename T>
-void node_print_max(node<T>* _node, ostream& _out_stream)
-{
-	if (_node == NULL)
-	{
-		INFO("NODE PRINT MAX: Элемент не существует");
-		return;
-	}
-
-	// печать элемента
-	_out_stream << "Максимальное число в списке: ";
-	node_print(_node, _out_stream);
-	_out_stream << '\n';
-}
-
 
 /****************************************************************
 *							   L I S T					        *
@@ -704,7 +685,7 @@ void list_print(list<T>* _list, ostream& _out_stream)
 
 // поиск максимального значения
 template<typename T>
-node<T>* list_find_max_elem(list<T>* _list)
+node<T>* list_find_max_elem(list<T>* _list, int& _pos)
 {
 	// выходим, если список не существует или пуст
 	LIST_NOT_EXSISTS_RET("FIND", NULL);
@@ -718,6 +699,9 @@ node<T>* list_find_max_elem(list<T>* _list)
 	// он равен второму по счету элементу в списке
 	node<T>* cur_node = _list->m_begin->m_next;
 
+	// обнуление позиции элемента
+	int _cur_pos = 0;
+
 	// пока не дошли до конца списка
 	while (cur_node != NULL)
 	{
@@ -726,8 +710,10 @@ node<T>* list_find_max_elem(list<T>* _list)
 		if (cur_node->m_data >= data->m_data)
 		{
 			data = cur_node;
+			_pos = _cur_pos;
 		}
 
+		_cur_pos++;
 		// переход к следующему элементу
 		cur_node = cur_node->m_next;
 	}
@@ -753,7 +739,7 @@ void list_insert(list<T>* _list, int _pos, T _insert_data)
 
 	// текущая позиция
 	int cur_pos = 0;
-
+	
 	// текущий элемент
 	node<T>* cur_node = _list->m_begin;
 
@@ -786,6 +772,27 @@ void list_insert(list<T>* _list, int _pos, T _insert_data)
 	_list->m_size++;
 
 	INFO("Элемент вставлен");
+}
+
+template<typename T>
+void print_max_elem(list<T>* _list)
+{
+	LIST_NOT_EXSISTS("PRINT MAX ELEM");
+	LIST_EMPTY("PRINT MAX ELEM");
+
+	// позиция в списке
+	int pos = 0;
+
+	// поиск максимального значения в списке
+	node<T>* max_elem = list_find_max_elem(_list, pos);
+
+	// печать позиции максимального элемента
+	cout << "Позиция max элемента: " << pos + 1 << endl;
+	cout << "Значение максимального элемента: ";
+
+	// его печать
+	node_print(max_elem);
+	cout << endl;
 }
 
 /**************** End Of LW4.cpp File ***************/
