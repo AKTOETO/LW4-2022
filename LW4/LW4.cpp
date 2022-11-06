@@ -659,12 +659,12 @@ void list_print(list<T>* _list, ostream& _out_stream)
 	int i = 0;
 
 	// печать шапки таблицы
-	cout << OUT_W('_', 22) << '\n';
+	_out_stream << OUT_W('_', 22) << '\n';
 
 	// дополнительная информация о списке list
 	_out_stream << "|_размер:_" <<
 		OUT_W('_', 9) << _list->m_size << "_|\n";
-	cout << "|_индекс_|_значение_|\n";
+	_out_stream << "|_индекс_|_значение_|\n";
 
 	// идем по list'у, пока на наткнемся на конечный элемент
 	while (cur_el != NULL)
