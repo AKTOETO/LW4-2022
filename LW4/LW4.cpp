@@ -166,10 +166,6 @@ void node_delete(
 	node<T>*& _node	// ссылка на элемент
 );
 
-// возвращение значение элемента
-template<typename T>
-T node_get_data(node<T>* _node);
-
 /****************************************************************
 *							   L I S T					        *
 ****************************************************************/
@@ -492,20 +488,6 @@ void node_delete(node<T>*& _node)
 	INFO("Элемент был удален");
 }
 
-// возвращение значение элемента
-template<typename T>
-T node_get_data(node<T>* _node)
-{
-	// выход из функции, если элемент не существует
-	if (_node == NULL)
-	{
-		INFO("NODE GET DATA: Элемент не существует");
-		return 0;
-	}
-
-	return _node->m_data;
-}
-
 /****************************************************************
 *							   L I S T					        *
 ****************************************************************/
@@ -665,7 +647,7 @@ void list_print(list<T>* _list, ostream& _out_stream)
 		// вывод данных элемента
 		_out_stream << "| " << OUT_W(' ', 6) << i
 			<< " | " << setprecision(1)
-			<< OUT_W(' ', 8) << node_get_data(cur_el)
+			<< OUT_W(' ', 8) << cur_el->m_data
 			<< " |\n";
 
 		// переход к следующему элементу
@@ -783,7 +765,7 @@ void list_print_max_elem(list<T>* _list)
 	// и самого элемента
 	cout << "Позиция max элемента: " << pos + 1 << endl;
 	cout << "Значение максимального элемента: "
-		<< node_get_data(max_elem) << endl;
+		<< max_elem->m_data << endl;
 }
 
 /**************** End Of LW4.cpp File ***************/
