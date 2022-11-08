@@ -252,7 +252,7 @@ void list_print_max_elem(
 int main()
 {
 	setlocale(LC_ALL, "ru");
-	 
+
 	// запуск диалога с пользователем
 	dialog<double>();
 
@@ -388,14 +388,14 @@ void dialog()
 		case input_codes::clear_console:
 			system("cls");
 			break;
-			 
+
 		case input_codes::find_max:
 			list_print_max_elem(lst);
 			break;
 
 		default:
 			INFO("Неизвестный код")
-			break;
+				break;
 		}
 
 	} while (
@@ -419,34 +419,34 @@ void example_program()
 	list_push(lst, 45656.9);
 	list_push(lst, 0.456);
 
-	// вывод списка
-	list_print(lst);
-
-	// вставка элемента в определенную позицию
-	list_insert(lst, 4, -10.0);
-	list_insert(lst, 0, 800.5);
-	list_insert(lst, 0, 99.009);
 
 	// вывод списка
 	list_print(lst);
+	cout << "\tследующий элемент после последнего: " << lst->m_end->m_next->m_data << endl;
 
-	// удаление элементов списка с конца
-	list_pop(lst);
-	list_pop(lst);
-	list_pop(lst);
-	list_pop(lst);
+	//list_pop(lst);
+	//list_pop(lst);
 
-	// вывод списка
-	list_print(lst);
+	//// вывод списка
+	//list_print(lst);
 
-	// печать максимального элемента списка
-	list_print_max_elem(lst);
+	//// удаление элементов списка с конца
+	//list_pop(lst);
+	//list_pop(lst);
+	//list_pop(lst);
+	//list_pop(lst);
 
-	// удаление списка
-	list_delete(lst);
+	//// вывод списка
+	//list_print(lst);
 
-	// вывод списка
-	list_print(lst);
+	//// печать максимального элемента списка
+	//list_print_max_elem(lst);
+
+	//// удаление списка
+	//list_delete(lst);
+
+	//// вывод списка
+	//list_print(lst);
 }
 
 /****************************************************************
@@ -545,10 +545,13 @@ void list_push(list<T>* _list, T data)
 	{
 		// создаем элемент для вставки в list
 		new_node = node_create<T>(
-			data, NULL, _list->m_end);
+			data, _list->m_begin, _list->m_end);
 
 		// настравиваем последний элемент в list
 		_list->m_end->m_next = new_node;
+
+		// настраиваем первый элемент
+		_list->m_begin->m_prev = new_node;
 
 		// настраиваем сам list
 		_list->m_end = new_node;
@@ -571,21 +574,25 @@ void list_pop(list<T>* _list)
 	// элемент удаления
 	node<T>* to_delete = _list->m_end;
 
-	// если в списке минимум 2 элемента
-	if (_list->m_begin != to_delete)
-	{
-		// настройка списка list
-		_list->m_end = to_delete->m_prev;
+	to_delete->m_prev->m_next = to_delete->m_next;
+	to_delete->m_next->m_prev = to_delete->m_prev;
 
-		// разрыв связей с элементом удаления
-		to_delete->m_prev->m_next = NULL;
-	}
-	else
-	{
-		// обнуляем адреса списка, указвающие
-		// на первый и последний элементы списка
-		_list->m_begin = _list->m_end = NULL;
-	}
+	_list->m_end = to_delete->m_prev;
+	//// если в списке минимум 2 элемента
+	//if (_list->m_begin != to_delete)
+	//{
+	//	// настройка списка list
+	//	_list->m_end = to_delete->m_prev;
+
+	//	// разрыв связей с элементом удаления
+	//	to_delete->m_prev->m_next = NULL;
+	//}
+	//else
+	//{
+	//	// обнуляем адреса списка, указвающие
+	//	// на первый и последний элементы списка
+	//	_list->m_begin = _list->m_end = NULL;
+	//}
 
 	// удаления самого элемента
 	node_delete(to_delete);
@@ -642,7 +649,7 @@ void list_print(list<T>* _list, ostream& _out_stream)
 	_out_stream << "|_индекс_|_значение_|\n";
 
 	// идем по list'у, пока на наткнемся на конечный элемент
-	while (cur_el != NULL)
+	do//while (cur_el != NULL)
 	{
 		// вывод данных элемента
 		_out_stream << "| " << OUT_W(' ', 6) << i
@@ -653,7 +660,7 @@ void list_print(list<T>* _list, ostream& _out_stream)
 		// переход к следующему элементу
 		cur_el = cur_el->m_next;
 		i++;
-	}
+	} while (cur_el != _list->m_begin);
 	// печать конца таблицы
 	_out_stream << OUT_W('-', 22) << '\n';
 }
@@ -714,7 +721,7 @@ void list_insert(list<T>* _list, int _pos, T _insert_data)
 
 	// текущая позиция
 	int cur_pos = 0;
-	
+
 	// текущий элемент
 	node<T>* cur_node = _list->m_begin;
 
@@ -732,12 +739,12 @@ void list_insert(list<T>* _list, int _pos, T _insert_data)
 
 	// настройка связей у элементов в списке
 	// если перед cur_node есть элементы
-	if (cur_node->m_prev != NULL)
+	//if (cur_node->m_prev != _list->m_end)
 	{
 		cur_node->m_prev->m_next = instert_elem;
 	}
 	// иначе меняем m_begin у списка на instert_elem
-	else
+	//else
 	{
 		_list->m_begin = instert_elem;
 	}
