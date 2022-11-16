@@ -38,7 +38,6 @@ public:
 	{
 		m_next = nullptr;
 		m_prev = nullptr;
-		m_data = T(0);
 
 		INFO("Ёлемент был удален");
 	}
