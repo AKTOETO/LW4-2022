@@ -63,7 +63,7 @@ class my_list
 {
 	node<T>* m_begin;	// указатель на первый элемент
 	node<T>* m_end;		// указатель на элемент после последнего
-	T m_size;			// количество элементов в списке
+	int m_size;			// количество элементов в списке
 
 public:
 	// конструктор
@@ -85,7 +85,7 @@ public:
 
 	node<T>* get_begin() const { return m_begin; }
 	node<T>* get_end() const { return m_end; }
-	T get_size() const { return size; }
+	int get_size() const { return m_size; }
 
 	// пуст ли список
 	bool is_empty() const { return m_begin == nullptr; }
@@ -218,9 +218,6 @@ public:
 		// создаем элемент для чтения данных из list'а
 		node<T>* cur_el = _list.get_begin();
 
-		// индекс элемента
-		int i = 0;
-
 		// идем по list'у, пока на наткнемся на конечный элемент
 		while (cur_el != nullptr)
 		{
@@ -229,7 +226,6 @@ public:
 
 			// переход к следующему элементу
 			cur_el = cur_el->get_next();
-			i++;
 		}
 		return _out_stream;
 	}
