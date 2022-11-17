@@ -69,9 +69,6 @@ public:
 	my_list() :m_begin(nullptr), m_end(nullptr), m_size(0) {};
 	~my_list()
 	{
-		// выходим, если список не существует
-		//LIST_NOT_EXSISTS("DELETE");
-
 		// пока список не пуст
 		while (!is_empty())
 		{
