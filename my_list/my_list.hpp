@@ -75,6 +75,17 @@ public:
 	// пуст ли список
 	bool is_empty() const { return m_begin == nullptr; }
 
+	// Очистка списка
+	void clear()
+	{
+		// пока список не пуст
+		while (!is_empty())
+		{
+			// удаляем элементы с конца
+			pop();
+		}
+	}
+
 	// функция добавления элемента в конец списка
 	void push(T data)
 	{
@@ -151,8 +162,8 @@ public:
 		if (_pos < 0 || _pos >= m_size)
 		{
 			cout << "\tINSERT: Позиция " << _pos
-				<<" в списке размером " <<m_size
-				<<" некорректна\n";
+				<< " в списке размером " << m_size
+				<< " некорректна\n";
 			return;
 		}
 
@@ -171,7 +182,7 @@ public:
 		}
 
 		// создание нового элемента списка
-		node<T>* instert_elem = 
+		node<T>* instert_elem =
 			new node<T>(_insert_data, cur_node, cur_node->get_prev());
 
 		// настройка связей у элементов в списке
@@ -207,5 +218,25 @@ public:
 			cur_el = cur_el->get_next();
 		}
 		return _out_stream;
+	}
+
+	// оператор присваивания
+	my_list<T>& operator=(const my_list<T>& _obj)
+	{
+		// очиста списка
+		clear();
+
+		// копирование размера списка
+		m_size = _obj.m_size;
+
+		// копирование элементов
+		node<T>* temp = _obj.m_begin;
+		while (temp)
+		{
+			push(temp->get_data());
+			temp = temp->get_next();
+		}
+
+		return *this;
 	}
 };

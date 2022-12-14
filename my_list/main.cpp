@@ -9,17 +9,19 @@ int main()
 
 	my_list<int> list;
 
-	cout << list << endl;
-
 	list.push(10);
 	list.push(11);
 	list.push(12);
 
-	cout << list << endl;
+	cout << endl<< list;
 
-	list.insert(3, 5);
+	my_list<int> lst;
 
-	cout << list << endl;
+	lst.push(10);
+	lst.push(11);
+	lst.push(12);
 
-	cout << list << endl;
+	lst = list;
+	cout << endl<< lst;
+
 }
