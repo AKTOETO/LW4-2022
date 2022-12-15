@@ -201,6 +201,58 @@ public:
 		// увеличение размера списка
 		m_size++;
 	}
+	
+	// удаление элемента на позиции _node
+	void delete_node(node<T>* _node)
+	{
+		// если существует предыдущий элемент и текущий
+		if (_node && _node->get_prev())
+		{
+			_node->get_prev()->set_next(_node->get_next());
+		}
+		// иначе если его нет
+		else if (_node)
+		{
+			_node->get_next()->set_prev(NULL);
+			m_begin = _node->get_next();
+		}
+
+		// если существует следующий элемент и текущий
+		if (_node && _node->get_next())
+		{
+			_node->get_next()->set_prev(_node->get_prev());
+		}
+		// иначе если его нет
+		else if (_node)
+		{
+			_node->get_prev()->set_next(NULL);
+			m_end = _node->get_prev();
+		}
+
+		delete _node;
+
+		m_size--;
+	}
+
+	// удаление элемента на позиции _pos
+	void delete_node(int _pos)
+	{
+		if (0 <= _pos && _pos < m_size)
+		{
+			// элемент для удаления
+			node<T>* temp = m_begin;
+			int index = 0;
+
+			// поиск элемента удаления
+			while (temp && index < _pos)
+			{
+				index++;
+				temp = temp->get_next();
+			}
+
+			delete_node(temp);
+		}
+	}
 
 	// печать
 	friend ostream& operator<<(ostream& _out_stream, const my_list<T>& _list)
