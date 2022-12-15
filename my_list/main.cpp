@@ -14,14 +14,20 @@ int main()
 	list.push(12);
 
 	cout << endl<< list;
+	cout << "\nsize: " << list.get_size();
 
 	my_list<int> lst;
 
-	lst.push(10);
-	lst.push(11);
-	lst.push(12);
+	lst.push(13);
+	lst.push(14);
+	lst.push(90);
+
+	lst += list;
+	cout << endl<< lst;
+	cout << "\nsize: " << lst.get_size();
 
 	lst = list;
-	cout << endl<< lst;
+	cout << endl << lst;
+	cout << "\nsize: " << lst.get_size();
 
 }

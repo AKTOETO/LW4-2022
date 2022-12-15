@@ -78,8 +78,6 @@ public:
 	// Очистка списка
 	void clear()
 	{
-		// обнуление размера списка
-		m_size = 0;
 		// пока список не пуст
 		while (!is_empty())
 		{
@@ -222,14 +220,25 @@ public:
 		return _out_stream;
 	}
 
+	// оператор присваивания со сложением
+	my_list<T>& operator+=(const my_list<T>& _obj)
+	{
+		// добавление элементов одного списка в другой
+		node<T>* temp = _obj.m_begin;
+		while (temp)
+		{
+			push(temp->get_data());
+			temp = temp->get_next();
+		}
+
+		return *this;
+	}
+
 	// оператор присваивания
 	my_list<T>& operator=(const my_list<T>& _obj)
 	{
 		// очиста списка
 		clear();
-
-		// копирование размера списка
-		m_size = _obj.m_size;
 
 		// копирование элементов
 		node<T>* temp = _obj.m_begin;
