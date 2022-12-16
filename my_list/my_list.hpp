@@ -278,6 +278,19 @@ public:
 		}
 	}
 
+	// возвращение элемента по индексу
+	node<T>* get_element_by_index(int _index)
+	{
+		int ind = 0;
+		node<T>* temp = m_begin;
+		while (temp)
+		{
+			if (ind++ == _index) return temp;
+			temp = temp->get_next();
+		}
+		return temp;
+	}
+
 	// печать
 	friend ostream& operator<<(ostream& _out_stream, const my_list<T>& _list)
 	{

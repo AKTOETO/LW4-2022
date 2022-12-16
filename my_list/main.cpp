@@ -33,4 +33,6 @@ int main()
 	cout<<"\n90: "<<lst.is_there_element(90);
 	cout<<"\n1290: "<<lst.is_there_element(1290);
 
+	cout<<"\n"<<lst.get_element_by_index(1)->get_data();
+
 }
