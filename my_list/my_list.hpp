@@ -266,6 +266,18 @@ public:
 		}
 	}
 
+	// выполнение какого-то действия для всего списка
+	template<class FUNC = void(node<T>*)>
+	void for_each(FUNC _func)
+	{
+		node<T>* temp = m_begin;
+		while (temp)
+		{
+			_func(temp);
+			temp = temp->get_next();
+		}
+	}
+
 	// печать
 	friend ostream& operator<<(ostream& _out_stream, const my_list<T>& _list)
 	{

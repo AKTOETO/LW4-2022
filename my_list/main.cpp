@@ -24,7 +24,11 @@ int main()
 
 	lst += list;
 	cout << endl<< lst;
-	cout << "\nsize: " << lst.get_size();
+	cout << "\nsize: " << lst.get_size() << endl ;
+
+	lst.for_each([](node<int>* el) {
+		cout << "(" << el->get_data() << ") ";
+		});
 
 	cout<<"\n90: "<<lst.is_there_element(90);
 	cout<<"\n1290: "<<lst.is_there_element(1290);
