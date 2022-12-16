@@ -75,6 +75,18 @@ public:
 	// пуст ли список
 	bool is_empty() const { return m_begin == nullptr; }
 
+	// есть ли этот элемент в списке
+	bool is_there_element(T _data) const
+	{
+		node<T>* nd = m_begin;
+		while (nd)
+		{
+			if (nd->get_data() == _data) return true;
+			nd = nd->get_next();
+		}
+		return false;
+	}
+
 	// Очистка списка
 	void clear()
 	{

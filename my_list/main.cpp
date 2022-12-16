@@ -26,8 +26,7 @@ int main()
 	cout << endl<< lst;
 	cout << "\nsize: " << lst.get_size();
 
-	lst.delete_node(lst.get_begin()->get_next());
-	cout << endl << lst;
-	cout << "\nsize: " << lst.get_size();
+	cout<<"\n90: "<<lst.is_there_element(90);
+	cout<<"\n1290: "<<lst.is_there_element(1290);
 
 }
