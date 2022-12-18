@@ -29,8 +29,22 @@ public:
 	// деструктор
 	~node()
 	{
+		
+		if (m_next) m_next->set_prev(m_prev);
+		if (m_prev) m_prev->set_next(m_next);		
+
 		m_next = nullptr;
 		m_prev = nullptr;
+	}
+
+	node<T>& operator= (const node<T>& _obj)
+	{
+		m_data = _obj.m_data;
+
+		if (_obj.m_next) m_next = _obj.m_next;
+		if (_obj.m_prev) m_prev = _obj.m_prev;
+
+		return *this;
 	}
 
 	void set_next(node<T>* _node) { m_next = _node; }
@@ -217,33 +231,40 @@ public:
 	// удаление элемента на позиции _node
 	void delete_node(node<T>* _node)
 	{
-		// если существует предыдущий элемент и текущий
-		if (_node && _node->get_prev())
+		// если это не единстввенный элемент
+		if (_node->get_prev() || _node->get_next())
 		{
-			_node->get_prev()->set_next(_node->get_next());
-		}
-		// иначе если его нет
-		else if (_node)
-		{
-			_node->get_next()->set_prev(NULL);
-			m_begin = _node->get_next();
-		}
+			// если существует предыдущий элемент и текущий
+			if (_node && _node->get_prev())
+			{
+				_node->get_prev()->set_next(_node->get_next());
+			}
+			// иначе если его нет
+			else if (_node)
+			{
+				_node->get_next()->set_prev(NULL);
+				m_begin = _node->get_next();
+			}
 
-		// если существует следующий элемент и текущий
-		if (_node && _node->get_next())
-		{
-			_node->get_next()->set_prev(_node->get_prev());
-		}
-		// иначе если его нет
-		else if (_node)
-		{
-			_node->get_prev()->set_next(NULL);
-			m_end = _node->get_prev();
-		}
+			// если существует следующий элемент и текущий
+			if (_node && _node->get_next())
+			{
+				_node->get_next()->set_prev(_node->get_prev());
+			}
+			// иначе если его нет
+			else if (_node)
+			{
+				_node->get_prev()->set_next(NULL);
+				m_end = _node->get_prev();
+			}
+			delete _node;
 
-		delete _node;
-
-		m_size--;
+			m_size--;
+		}
+		else
+		{
+			pop();
+		}
 	}
 
 	// удаление элемента на позиции _pos
