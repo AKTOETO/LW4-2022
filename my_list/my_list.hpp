@@ -29,8 +29,22 @@ public:
 	// деструктор
 	~node()
 	{
+		
+		if (m_next) m_next->set_prev(m_prev);
+		if (m_prev) m_prev->set_next(m_next);		
+
 		m_next = nullptr;
 		m_prev = nullptr;
+	}
+
+	node<T>& operator= (const node<T>& _obj)
+	{
+		m_data = _obj.m_data;
+
+		if (_obj.m_next) m_next = _obj.m_next;
+		if (_obj.m_prev) m_prev = _obj.m_prev;
+
+		return *this;
 	}
 
 	void set_next(node<T>* _node) { m_next = _node; }
@@ -75,11 +89,21 @@ public:
 	// пуст ли список
 	bool is_empty() const { return m_begin == nullptr; }
 
+	// есть ли этот элемент в списке
+	bool is_there_element(T _data) const
+	{
+		node<T>* nd = m_begin;
+		while (nd)
+		{
+			if (nd->get_data() == _data) return true;
+			nd = nd->get_next();
+		}
+		return false;
+	}
+
 	// Очистка списка
 	void clear()
 	{
-		// обнуление размера списка
-		m_size = 0;
 		// пока список не пуст
 		while (!is_empty())
 		{
@@ -203,6 +227,90 @@ public:
 		// увеличение размера списка
 		m_size++;
 	}
+	
+	// удаление элемента на позиции _node
+	void delete_node(node<T>* _node)
+	{
+		// если это не единстввенный элемент
+		if (_node->get_prev() || _node->get_next())
+		{
+			// если существует предыдущий элемент и текущий
+			if (_node && _node->get_prev())
+			{
+				_node->get_prev()->set_next(_node->get_next());
+			}
+			// иначе если его нет
+			else if (_node)
+			{
+				_node->get_next()->set_prev(NULL);
+				m_begin = _node->get_next();
+			}
+
+			// если существует следующий элемент и текущий
+			if (_node && _node->get_next())
+			{
+				_node->get_next()->set_prev(_node->get_prev());
+			}
+			// иначе если его нет
+			else if (_node)
+			{
+				_node->get_prev()->set_next(NULL);
+				m_end = _node->get_prev();
+			}
+			delete _node;
+
+			m_size--;
+		}
+		else
+		{
+			pop();
+		}
+	}
+
+	// удаление элемента на позиции _pos
+	void delete_node(int _pos)
+	{
+		if (0 <= _pos && _pos < m_size)
+		{
+			// элемент для удаления
+			node<T>* temp = m_begin;
+			int index = 0;
+
+			// поиск элемента удаления
+			while (temp && index < _pos)
+			{
+				index++;
+				temp = temp->get_next();
+			}
+
+			delete_node(temp);
+		}
+	}
+
+	// выполнение какого-то действия для всего списка
+	template<class FUNC = void(node<T>*)>
+	void for_each(FUNC _func)
+	{
+		node<T>* temp = m_begin;
+		while (temp)
+		{
+			_func(temp);
+			temp = temp->get_next();
+		}
+	}
+
+	// возвращение элемента по индексу
+	node<T>* get_element_by_index(int _index)
+	{
+		int ind = 0;
+		node<T>* temp = m_begin;
+		while (temp)
+		{
+			if (ind++ == _index) return temp;
+			temp = temp->get_next();
+		}
+		return temp;
+	}
 
 	// печать
 	friend ostream& operator<<(ostream& _out_stream, const my_list<T>& _list)
@@ -222,14 +330,25 @@ public:
 		return _out_stream;
 	}
 
+	// оператор присваивания со сложением
+	my_list<T>& operator+=(const my_list<T>& _obj)
+	{
+		// добавление элементов одного списка в другой
+		node<T>* temp = _obj.m_begin;
+		while (temp)
+		{
+			push(temp->get_data());
+			temp = temp->get_next();
+		}
+
+		return *this;
+	}
+
 	// оператор присваивания
 	my_list<T>& operator=(const my_list<T>& _obj)
 	{
 		// очиста списка
 		clear();
-
-		// копирование размера списка
-		m_size = _obj.m_size;
 
 		// копирование элементов
 		node<T>* temp = _obj.m_begin;
